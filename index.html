@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Boundary Blitz - Cricket Batting Game</title>
+  <meta name="description" content="Boundary Blitz: a fast-paced browser cricket batting game. Score big in T20-style challenges!">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Poppins:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div class="app-shell">
+    <div class="bg-glow bg-glow-a"></div>
+    <div class="bg-glow bg-glow-b"></div>
+    <div class="stadium-lights" aria-hidden="true"></div>
+
+    <section id="home-screen" class="screen active" aria-label="Home screen">
+      <header class="hero">
+        <p class="eyebrow">T20 Batting Challenge</p>
+        <h1 class="game-title">BOUNDARY <span>BLITZ</span></h1>
+        <p class="tagline">Step up to the crease. Read the delivery. Smash it into the stands.</p>
+        <div class="hero-actions">
+          <button id="play-now-btn" class="btn btn-primary btn-lg">Play Now</button>
+          <button id="how-to-play-btn" class="btn btn-ghost btn-lg">How to Play</button>
+        </div>
+      </header>
+      <div class="home-grid">
+        <div class="panel how-to-panel" id="how-to-play-panel">
+          <h2 class="panel-title">How to Play</h2>
+          <ul class="how-list">
+            <li><span class="how-icon">⌨</span><div><strong>Keyboard:</strong> Left/Right arrows choose shot direction (Off/Leg). Press <kbd>Space</kbd> to swing.</div></li>
+            <li><span class="how-icon">📱</span><div><strong>Touch/Mobile:</strong> Use on-screen Off/Leg and Swing buttons.</div></li>
+            <li><span class="how-icon">🎯</span><div><strong>Timing:</strong> Perfect = Six, Good = Four, Average = 1-3 runs. Mistime it and you risk a miss or wicket.</div></li>
+            <li><span class="how-icon">🏏</span><div><strong>Goal:</strong> Score as many runs as possible in 5 overs (30 balls) before losing 3 wickets.</div></li>
+          </ul>
+        </div>
+        <div class="panel leaderboard-panel">
+          <h2 class="panel-title">Top 5 Local Scores</h2>
+          <div class="leaderboard-table-wrap">
+            <table class="leaderboard-table" aria-label="Top 5 local scores">
+              <thead><tr><th>#</th><th>Score</th><th>Mode</th><th>Diff</th></tr></thead>
+              <tbody id="leaderboard-body"></tbody>
+            </table>
+          </div>
+          <p id="leaderboard-empty" class="muted empty-msg">No scores yet. Be the first to blitz!</p>
+        </div>
+      </div>
+    </section>
+
+    <section id="setup-screen" class="screen" aria-label="Game setup">
+      <div class="setup-card panel">
+        <button id="setup-back-btn" class="btn btn-ghost btn-sm back-btn">← Back</button>
+        <p class="eyebrow">Match Setup</p>
+        <h2 class="section-title">Choose Your Challenge</h2>
+        <div class="setup-group">
+          <h3 class="setup-label">Game Mode</h3>
+          <div class="option-grid" id="mode-options">
+            <button class="option-card selected" data-mode="quick"><span class="option-icon">⚡</span><span class="option-name">Quick Play</span><span class="option-desc">5 overs · 30 balls</span></button>
+            <button class="option-card" data-mode="chase"><span class="option-icon">🎯</span><span class="option-name">Chase Mode</span><span class="option-desc">Chase a random target</span></button>
+            <button class="option-card" data-mode="super"><span class="option-icon">🔥</span><span class="option-name">Super Over</span><span class="option-desc">6 balls · Max runs</span></button>
+          </div>
+        </div>
+        <div class="setup-group">
+          <h3 class="setup-label">Difficulty</h3>
+          <div class="option-grid option-grid-3" id="difficulty-options">
+            <button class="option-card" data-difficulty="easy"><span class="option-name">Easy</span><span class="option-desc">Slower, readable</span></button>
+            <button class="option-card selected" data-difficulty="medium"><span class="option-name">Medium</span><span class="option-desc">Balanced challenge</span></button>
+            <button class="option-card" data-difficulty="hard"><span class="option-name">Hard</span><span class="option-desc">Fast &amp; tricky</span></button>
+          </div>
+        </div>
+        <div class="setup-actions"><button id="start-game-btn" class="btn btn-primary btn-lg">Start Innings</button></div>
+      </div>
+    </section>
+
+    <section id="game-screen" class="screen" aria-label="Game screen">
+      <div class="game-layout">
+        <div class="game-topbar">
+          <div class="brand-mini">BOUNDARY <span>BLITZ</span></div>
+          <div class="topbar-actions">
+            <button id="mute-btn" class="icon-btn" aria-label="Toggle sound" title="Mute/Unmute">🔊</button>
+            <button id="pause-btn" class="icon-btn" aria-label="Pause game" title="Pause">⏸</button>
+          </div>
+        </div>
+        <div class="scoreboard" aria-label="Scoreboard">
+          <div class="score-main">
+            <div class="score-runs"><span id="score-runs">0</span><span class="score-wickets">/<span id="score-wickets">0</span></span></div>
+            <div class="score-label" id="score-mode-label">Quick Play</div>
+          </div>
+          <div class="score-stats">
+            <div class="stat"><span class="stat-label">Overs</span><span class="stat-value" id="stat-overs">0.0 / 5.0</span></div>
+            <div class="stat"><span class="stat-label">Balls Left</span><span class="stat-value" id="stat-balls">30</span></div>
+            <div class="stat"><span class="stat-label">Run Rate</span><span class="stat-value" id="stat-rr">0.00</span></div>
+            <div class="stat target-stat" id="target-stat"><span class="stat-label">Target</span><span class="stat-value" id="stat-target">-</span></div>
+          </div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="game-canvas" width="900" height="560" aria-label="Cricket pitch"></canvas>
+          <div id="event-banner" class="event-banner" aria-live="polite"></div>
+        </div>
+        <div class="commentary-bar" aria-live="polite">
+          <span class="commentary-tag">COMMENTARY</span>
+          <span id="commentary-text">Get ready... the bowler is marking the run-up!</span>
+        </div>
+        <div class="controls-bar">
+          <div class="direction-controls">
+            <button id="btn-off" class="control-btn dir-btn" data-dir="off" aria-label="Off side shot">◀ OFF</button>
+            <div class="dir-indicator">Shot: <strong id="dir-display">OFF</strong></div>
+            <button id="btn-leg" class="control-btn dir-btn" data-dir="leg" aria-label="Leg side shot">LEG ▶</button>
+          </div>
+          <button id="btn-swing" class="control-btn swing-btn" aria-label="Swing bat">SWING</button>
+          <p class="controls-hint"><kbd>←</kbd><kbd>→</kbd> Direction &nbsp;·&nbsp; <kbd>Space</kbd> Swing &nbsp;·&nbsp; <kbd>P</kbd> Pause</p>
+        </div>
+      </div>
+    </section>
+
+    <div id="pause-overlay" class="overlay" aria-hidden="true">
+      <div class="overlay-card panel">
+        <h2 class="overlay-title">Paused</h2>
+        <p class="muted">Take a breather. The crowd is waiting.</p>
+        <div class="overlay-actions">
+          <button id="resume-btn" class="btn btn-primary">Resume</button>
+          <button id="restart-btn" class="btn btn-ghost">Restart</button>
+          <button id="quit-btn" class="btn btn-danger">Quit to Home</button>
+        </div>
+      </div>
+    </div>
+
+    <div id="gameover-overlay" class="overlay" aria-hidden="true">
+      <div class="overlay-card panel gameover-card">
+        <p class="eyebrow" id="gameover-eyebrow">Innings Complete</p>
+        <h2 class="overlay-title" id="gameover-title">Game Over</h2>
+        <p id="gameover-result" class="gameover-result"></p>
+        <div class="gameover-score"><span id="final-score">0</span><span class="gameover-wk">/<span id="final-wickets">0</span></span></div>
+        <div class="gameover-stats">
+          <div class="go-stat"><span class="go-val" id="final-sr">0.0</span><span class="go-lbl">Strike Rate</span></div>
+          <div class="go-stat"><span class="go-val" id="final-fours">0</span><span class="go-lbl">Fours</span></div>
+          <div class="go-stat"><span class="go-val" id="final-sixes">0</span><span class="go-lbl">Sixes</span></div>
+          <div class="go-stat"><span class="go-val" id="final-balls">0</span><span class="go-lbl">Balls</span></div>
+        </div>
+        <p id="new-highscore" class="new-highscore" hidden>🏆 New High Score!</p>
+        <div class="overlay-actions">
+          <button id="play-again-btn" class="btn btn-primary">Play Again</button>
+          <button id="home-btn" class="btn btn-ghost">Home</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script src="game.js"></script>
+</body>
+</html>

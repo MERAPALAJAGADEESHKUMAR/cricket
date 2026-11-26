@@ -1,0 +1,10 @@
+{
+  "name": "cricket-game",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Static cricket game with a zero-dependency dev server",
+  "scripts": {
+    "dev": "node server.js",
+    "start": "node server.js"
+  }
+}
